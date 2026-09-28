@@ -1,6 +1,6 @@
 import { DAMAGE_SOURCES } from '../data/damageSources'
 import { EARTHQUAKE_LEVELS, MAX_EARTHQUAKES, MAX_EARTHQUAKE_LEVEL } from '../data/earthquake'
-import { TARGET_BUILDINGS, findBuilding, getBuildingHp } from '../data/targets'
+import { findBuilding, getBuildingHp } from '../data/targets'
 import { getMaxLevel, withCombo } from '../lib/damage'
 import { clamp } from '../lib/math'
 import type { CalculatorState, Combo, SourceSelection, TargetSelection } from '../types'
@@ -21,26 +21,20 @@ export type CalculatorAction =
   | { type: 'load'; state: CalculatorState }
   | { type: 'reset' }
 
-const DEFAULT_ACTIVE_SOURCES = new Set(['giant-arrow', 'rocket-backpack'])
-
 function withTarget(state: CalculatorState, target: TargetSelection): CalculatorState {
   const hp = getBuildingHp(target)
   return hp === undefined ? state : { ...state, target, targetHp: hp }
 }
 
+/** Semua isian kosong; level tetap di level tertinggi agar pilihan siap dipakai. */
 export function createInitialState(): CalculatorState {
-  const building = TARGET_BUILDINGS[0]
-  const target = { buildingId: building.id, level: building.defaultLevel }
   return {
-    targetHp: getBuildingHp(target) ?? 0,
-    target,
+    targetHp: 0,
+    target: null,
     earthquakeLevel: MAX_EARTHQUAKE_LEVEL,
-    earthquakeCount: 2,
+    earthquakeCount: 0,
     selections: Object.fromEntries(
-      DAMAGE_SOURCES.map((source) => [
-        source.id,
-        { quantity: DEFAULT_ACTIVE_SOURCES.has(source.id) ? 1 : 0, level: getMaxLevel(source) },
-      ]),
+      DAMAGE_SOURCES.map((source) => [source.id, { quantity: 0, level: getMaxLevel(source) }]),
     ),
     extraDamage: 0,
   }

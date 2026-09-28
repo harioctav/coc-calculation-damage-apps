@@ -4,7 +4,7 @@ import { readStorage, writeStorage } from '../lib/storage'
 import { calculatorReducer, sanitizeState } from '../state/calculatorReducer'
 import type { CalculatorState, Combo } from '../types'
 
-const STORAGE_KEY = 'coc-calc:calculator:v1'
+const STORAGE_KEY = 'coc-calc:calculator:v2'
 
 export function useCalculator() {
   const [state, dispatch] = useReducer(calculatorReducer, undefined, () =>

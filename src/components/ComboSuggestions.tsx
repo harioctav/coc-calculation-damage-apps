@@ -19,7 +19,9 @@ export function ComboSuggestions({ state, suggestions, onApply }: ComboSuggestio
     >
       {suggestions.length === 0 ? (
         <p className="rounded-2xl bg-slate-950/50 p-4 text-center text-sm text-slate-500">
-          Tidak ada kombinasi yang cukup untuk menghancurkan target ini.
+          {state.targetHp > 0
+            ? 'Tidak ada kombinasi yang cukup untuk menghancurkan target ini.'
+            : 'Pilih target dulu untuk melihat saran kombinasi.'}
         </p>
       ) : (
         <ol className="space-y-2">

@@ -7,7 +7,9 @@ interface MobileResultBarProps {
 }
 
 export function MobileResultBar({ targetHp, result }: MobileResultBarProps) {
-  const progress = targetHp > 0 ? Math.min(result.totalDamage / targetHp, 1) * 100 : 0
+  if (targetHp <= 0) return null
+
+  const progress = Math.min(result.totalDamage / targetHp, 1) * 100
 
   return (
     <a

@@ -30,7 +30,8 @@ export function NumberInput({
         inputMode="numeric"
         min={min}
         max={max}
-        value={draft ?? String(value)}
+        placeholder="0"
+        value={draft ?? (value === 0 ? '' : String(value))}
         onChange={(event) => {
           const text = event.target.value
           setDraft(text)

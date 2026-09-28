@@ -18,6 +18,18 @@ function buildState(overrides: Partial<CalculatorState> = {}): CalculatorState {
   return { ...initial, ...overrides, selections: { ...initial.selections, ...overrides.selections } }
 }
 
+const MAX_EQUIPMENT: CalculatorState['selections'] = {
+  'giant-arrow': { quantity: 1, level: 18 },
+  'rocket-backpack': { quantity: 1, level: 27 },
+}
+
+const clanCastle11 = buildState({
+  targetHp: 5400,
+  target: { buildingId: 'clan-castle', level: 11 },
+  earthquakeCount: 2,
+  selections: MAX_EQUIPMENT,
+})
+
 describe('getEarthquakeHits', () => {
   it('gempa ke-2, 3, 4 memberi 1/3, 1/5, 1/7 dari damage gempa pertama', () => {
     const [first, second, third, fourth] = getEarthquakeHits(4800, 29, 4)
@@ -29,7 +41,7 @@ describe('getEarthquakeHits', () => {
 
   it('HP 6300 hancur dengan 3 gempa + Giant Arrow & Rocket Backpack level max (hasil lapangan)', () => {
     const result = calculateDamage(
-      buildState({ targetHp: 6300, target: null, earthquakeCount: 3 }),
+      buildState({ targetHp: 6300, earthquakeCount: 3, selections: MAX_EQUIPMENT }),
     )
     expect(result.totalDamage).toBeCloseTo(6451.4)
     expect(result.isDestroyed).toBe(true)
@@ -69,8 +81,7 @@ describe('calculateDamage', () => {
   it('menghitung sisa HP jika belum hancur', () => {
     const state = buildState({
       targetHp: 10000,
-      earthquakeCount: 0,
-      selections: { 'giant-arrow': { quantity: 1, level: 18 } },
+      selections: MAX_EQUIPMENT,
     })
     const result = calculateDamage(state)
     expect(result.isDestroyed).toBe(false)
@@ -130,7 +141,7 @@ describe('getLevelDamage', () => {
 
 describe('findCombos', () => {
   it('hanya mengembalikan kombinasi minimal yang menghancurkan target', () => {
-    const state = createInitialState()
+    const state = clanCastle11
     const suggestions = findCombos(state)
 
     expect(suggestions.length).toBeGreaterThan(0)
@@ -161,6 +172,23 @@ describe('describeLoadout', () => {
 })
 
 describe('calculatorReducer', () => {
+  it('state awal kosong: tanpa target, tanpa gempa, tanpa sumber damage', () => {
+    const initial = createInitialState()
+    expect(initial.target).toBeNull()
+    expect(initial.targetHp).toBe(0)
+    expect(initial.earthquakeCount).toBe(0)
+    expect(initial.extraDamage).toBe(0)
+    expect(Object.values(initial.selections).every((s) => s.quantity === 0)).toBe(true)
+
+    const result = calculateDamage(initial)
+    expect(result.totalDamage).toBe(0)
+    expect(result.isDestroyed).toBe(false)
+  })
+
+  it('reset mengembalikan semua isian ke kosong', () => {
+    expect(calculatorReducer(clanCastle11, { type: 'reset' })).toEqual(createInitialState())
+  })
+
   it('membatasi jumlah sumber damage sesuai maxQuantity', () => {
     const state = calculatorReducer(createInitialState(), {
       type: 'setSourceQuantity',
@@ -181,7 +209,7 @@ describe('calculatorReducer', () => {
   })
 
   it('memilih level bangunan mengisi hitpoint sesuai tabel', () => {
-    const state = calculatorReducer(createInitialState(), { type: 'setBuildingLevel', level: 14 })
+    const state = calculatorReducer(clanCastle11, { type: 'setBuildingLevel', level: 14 })
     expect(state.target).toEqual({ buildingId: 'clan-castle', level: 14 })
     expect(state.targetHp).toBe(6000)
   })

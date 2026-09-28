@@ -14,9 +14,32 @@ interface ResultPanelProps {
 
 const SAVED_FEEDBACK_MS = 1500
 
+type Verdict = 'empty' | 'destroyed' | 'standing'
+
+const VERDICT_STYLES: Record<Verdict, { banner: string; title: string; label: string }> = {
+  empty: {
+    banner: 'bg-slate-950/50 ring-white/10',
+    title: 'text-slate-300',
+    label: '🎯 Pilih Target',
+  },
+  destroyed: {
+    banner: 'bg-linear-to-br from-emerald-500/25 to-emerald-800/10 ring-emerald-400/40',
+    title: 'text-emerald-300',
+    label: '🏆 HANCUR!',
+  },
+  standing: {
+    banner: 'bg-linear-to-br from-rose-500/20 to-rose-900/10 ring-rose-400/30',
+    title: 'text-rose-300',
+    label: '🛡️ Belum Hancur',
+  },
+}
+
 export function ResultPanel({ targetName, targetHp, result, onSave, onReset }: ResultPanelProps) {
   const { segments, totalDamage, remainingHp, overkill, isDestroyed } = result
   const [justSaved, setJustSaved] = useState(false)
+  const hasTarget = targetHp > 0
+  const verdict: Verdict = !hasTarget ? 'empty' : isDestroyed ? 'destroyed' : 'standing'
+  const styles = VERDICT_STYLES[verdict]
 
   useEffect(() => {
     if (!justSaved) return
@@ -25,27 +48,17 @@ export function ResultPanel({ targetName, targetHp, result, onSave, onReset }: R
   }, [justSaved])
 
   return (
-    <Panel title="Hasil Perhitungan" icon="📊" description={targetName}>
+    <Panel title="Hasil Perhitungan" icon="📊" description={hasTarget ? targetName : undefined}>
       <div
-        key={String(isDestroyed)}
-        className={`mb-5 animate-pop rounded-2xl p-4 text-center ring-1 ${
-          isDestroyed
-            ? 'bg-linear-to-br from-emerald-500/25 to-emerald-800/10 ring-emerald-400/40'
-            : 'bg-linear-to-br from-rose-500/20 to-rose-900/10 ring-rose-400/30'
-        }`}
+        key={verdict}
+        className={`mb-5 animate-pop rounded-2xl p-4 text-center ring-1 ${styles.banner}`}
         aria-live="polite"
       >
-        <p
-          className={`font-display text-3xl tracking-wide ${
-            isDestroyed ? 'text-emerald-300' : 'text-rose-300'
-          }`}
-        >
-          {isDestroyed ? '🏆 HANCUR!' : '🛡️ Belum Hancur'}
-        </p>
+        <p className={`font-display text-3xl tracking-wide ${styles.title}`}>{styles.label}</p>
         <p className="mt-1 text-sm text-slate-300">
-          {isDestroyed
-            ? `Kelebihan damage +${formatNumber(overkill)}`
-            : `Masih kurang ${formatNumber(remainingHp)} HP`}
+          {verdict === 'empty' && 'Pilih bangunan atau isi hitpoint untuk mulai menghitung'}
+          {verdict === 'destroyed' && `Kelebihan damage +${formatNumber(overkill)}`}
+          {verdict === 'standing' && `Masih kurang ${formatNumber(remainingHp)} HP`}
         </p>
       </div>
 
@@ -94,7 +107,8 @@ export function ResultPanel({ targetName, targetHp, result, onSave, onReset }: R
             onSave()
             setJustSaved(true)
           }}
-          className="flex-1 rounded-2xl bg-linear-to-b from-amber-300 to-amber-500 px-4 py-3 font-display tracking-wide text-slate-950 shadow-lg shadow-amber-500/25 transition hover:brightness-110 active:scale-95"
+          disabled={!hasTarget}
+          className="flex-1 rounded-2xl bg-linear-to-b from-amber-300 to-amber-500 px-4 py-3 font-display tracking-wide text-slate-950 shadow-lg shadow-amber-500/25 transition hover:brightness-110 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
         >
           {justSaved ? '✓ Tersimpan!' : '💾 Simpan ke Riwayat'}
         </button>
