@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react'
 import { useMemo } from 'react'
 import { ComboSuggestions } from './components/ComboSuggestions'
 import { DamageSourcesPanel } from './components/DamageSourcesPanel'
@@ -72,6 +73,7 @@ export default function App() {
       <Footer />
 
       <MobileResultBar targetHp={state.targetHp} result={result} />
+      <Analytics />
     </div>
   )
 }
