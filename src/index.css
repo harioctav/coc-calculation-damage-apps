@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Lilita One', 'Nunito', ui-sans-serif, system-ui, sans-serif;
+
+  --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes pop {
+    from {
+      transform: scale(0.92);
+      opacity: 0.4;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-950 font-sans text-slate-100 antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgb(245 158 11 / 0.18), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgb(59 130 246 / 0.12), transparent);
+    background-attachment: fixed;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  select:focus-visible {
+    @apply outline-2 outline-offset-2 outline-amber-400;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
