@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { ComboSuggestions } from './components/ComboSuggestions'
 import { DamageSourcesPanel } from './components/DamageSourcesPanel'
 import { EarthquakePanel } from './components/EarthquakePanel'
+import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { HistoryPanel } from './components/HistoryPanel'
 import { MobileResultBar } from './components/MobileResultBar'
@@ -67,6 +68,8 @@ export default function App() {
           />
         </div>
       </main>
+
+      <Footer />
 
       <MobileResultBar targetHp={state.targetHp} result={result} />
     </div>
